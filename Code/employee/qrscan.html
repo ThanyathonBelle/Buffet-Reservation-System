@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Scanner</title>
+</head>
+<style>
+#reader {
+    max-width: 60vw;
+    left: 20%;
+}
+
+@media screen and (max-width: 700px) {
+    #reader {
+        max-width: 80vw;
+        left: 8%;
+    }
+}
+
+
+</style>
+<body>
+    <div id="reader"></div>
+    <form id="formscan" action="reservation_verify.php" method="get">
+        <input type="hidden" id="booking_code" name="booking_code">
+    </form>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                    var qrCodeScanner = new Html5Qrcode('reader');
+                    var qrboxSize = Math.min(window.innerWidth, window.innerHeight) * 0.7;
+                    qrCodeScanner.start(
+                        { facingMode: "environment" },
+                        { fps: 10, qrbox: qrboxSize },
+                        function (code) {
+                            console.log('อ่าน QR Code สำเร็จ', code);
+                            qrCodeScanner.stop()
+                            document.getElementById('booking_code').value = code;
+                            document.getElementById('formscan').submit()
+                        },
+                        function (error) {
+                            console.log('พบข้อผิดพลาด', error);
+                        }
+                    );
+                })
+                .catch(function(error) {
+                    console.error('ไม่สามารถเข้าถึงกล้องได้', error);
+                });
+        });
+    </script>
+</body>
+</html>
+
